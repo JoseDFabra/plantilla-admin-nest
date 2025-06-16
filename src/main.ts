@@ -13,7 +13,7 @@ async function bootstrap() {
       credentials: true,
     },
   });
-  console.log('CORS origin permitido:', process.env.URL_FRONT);
+  //console.log('CORS origin permitido:', process.env.URL_FRONT);
 
 
   app.setGlobalPrefix('api');

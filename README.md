@@ -84,8 +84,10 @@ CREATE TABLE Users (
   password NVARCHAR(255) NOT NULL,
   refreshToken NVARCHAR(MAX) NULL,
   id_rol INT NOT NULL,
+  is_active BIT NOT NULL DEFAULT 1,
   CONSTRAINT FK_Users_Roles FOREIGN KEY (id_rol) REFERENCES Roles(id)
 );
+
 
 
 INSERT INTO Users (
@@ -97,13 +99,14 @@ INSERT INTO Users (
   refreshToken,
   id_rol
 ) VALUES (
-  'Super Administrador',
-  '123456789',
+  'Jose Daniel Fabra',
+  '1234',
   '3001234567',
   'admin@itm.edu.co',
-  '$2b$10$J.PMRW1jcK2KaTzWxwb5zOd7pfx8A0K.7gCrD1IZ0IWRe3OCFGGVi',
+  '$12$drQYU5NjLwgFa4vE.mFdKeiDD63BKZH8Q/ht8kUosEghxWXMwMFfS',
   NULL,
-  1 -- id del rol "SuperAdmin"   user: admins     pass:admin123
+  1,  -- id del rol "SuperAdmin"
+  1 
 );
 
 ```

@@ -17,11 +17,11 @@ import * as bcrypt from 'bcrypt';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import {Request} from 'express';
 
-@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
   
+  @UseGuards(JwtAuthGuard)
   @Get('me')
   async getMe(@Req() req: Request ){
      const userId = (req.user as any).userId;

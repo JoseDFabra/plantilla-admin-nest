@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { User } from './interfaces/user.interface';
 
@@ -28,6 +32,7 @@ export class UserService {
     correo?: string;
     password: string;
     id_rol: number;
+    is_active?: boolean;
   }): Promise<User> {
     const existing = await this.findByDocumento(data.documento);
     if (existing) {
@@ -36,10 +41,10 @@ export class UserService {
 
     const result = await this.dataSource.query(
       `
-      INSERT INTO Users (nombre_completo, documento, telefono, correo, password, id_rol)
-      OUTPUT INSERTED.*
-      VALUES (@0, @1, @2, @3, @4, @5)
-      `,
+    INSERT INTO Users (nombre_completo, documento, telefono, correo, password, id_rol, is_active)
+    OUTPUT INSERTED.*
+    VALUES (@0, @1, @2, @3, @4, @5, @6)
+    `,
       [
         data.nombre_completo,
         data.documento,
@@ -47,6 +52,7 @@ export class UserService {
         data.correo || null,
         data.password,
         data.id_rol,
+        data.is_active ?? true,
       ],
     );
 
@@ -59,7 +65,7 @@ export class UserService {
       SELECT u.*, r.nombre AS rol
       FROM Users u
       JOIN Roles r ON u.id_rol = r.id
-      `
+      `,
     );
     return result;
   }
@@ -79,16 +85,17 @@ export class UserService {
     const existing = await this.findUserById(id);
 
     const updateQuery = `
-      UPDATE Users
-      SET 
-        nombre_completo = @0,
-        documento = @1,
-        telefono = @2,
-        correo = @3,
-        password = @4,
-        id_rol = @5
-      WHERE id = @6
-    `;
+    UPDATE Users
+    SET 
+      nombre_completo = @0,
+      documento = @1,
+      telefono = @2,
+      correo = @3,
+      password = @4,
+      id_rol = @5,
+      is_active = @6
+    WHERE id = @7
+  `;
 
     await this.dataSource.query(updateQuery, [
       data.nombre_completo ?? existing.nombre_completo,
@@ -97,6 +104,7 @@ export class UserService {
       data.correo ?? existing.correo,
       data.password ?? existing.password,
       data.id_rol ?? existing.id_rol,
+      data.is_active ?? existing.is_active,
       id,
     ]);
 
@@ -106,9 +114,6 @@ export class UserService {
   async deleteUser(id: number): Promise<void> {
     const existing = await this.findUserById(id);
 
-    await this.dataSource.query(
-      `DELETE FROM Users WHERE id = @0`,
-      [id],
-    );
+    await this.dataSource.query(`DELETE FROM Users WHERE id = @0`, [id]);
   }
 }
