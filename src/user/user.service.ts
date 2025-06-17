@@ -84,6 +84,14 @@ export class UserService {
   async updateUser(id: number, data: Partial<User>): Promise<User> {
     const existing = await this.findUserById(id);
 
+    if (data.documento) {
+      const otro = await this.findByDocumento(data.documento);
+      if (otro && otro.id !== id) {
+        throw new ConflictException('El documento ya está registrado.');
+      }
+    }
+
+
     const updateQuery = `
     UPDATE Users
     SET 
@@ -113,6 +121,11 @@ export class UserService {
 
   async deleteUser(id: number): Promise<void> {
     const existing = await this.findUserById(id);
+    if (!existing) {
+      throw new NotFoundException(
+        'No es posible eliminar algo que no existe en la base de datos',
+      );
+    }
 
     await this.dataSource.query(`DELETE FROM Users WHERE id = @0`, [id]);
   }

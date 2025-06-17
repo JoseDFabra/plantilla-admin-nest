@@ -10,47 +10,53 @@ import {
   BadRequestException,
   UseGuards,
   Req,
+  Query,
+  NotFoundException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './interfaces/user.interface';
 import * as bcrypt from 'bcrypt';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import {Request} from 'express';
+import { Request } from 'express';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-  
+
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  async getMe(@Req() req: Request ){
-     const userId = (req.user as any).userId;
+  async getMe(@Req() req: Request) {
+    const userId = (req.user as any).userId;
     const user = await this.userService.findUserById(userId);
     if (user) {
       const { password, ...rest } = user; // 👈 oculta la contraseña
       return rest;
-
     }
 
-    return {user};
+    return { user };
   }
-  
-  
+
+  @Get('by-documento')
+  async findByDocumento(@Query('documento') documento: string): Promise<User> {
+    const user = await this.userService.findByDocumento(documento.trim());
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado con ese documento.');
+    }
+    return user;
+  }
 
   // 🚀 Crear usuario (con encriptación de contraseña)
   @Post()
-  async create(@Body() body: Omit<User, 'id' | 'refreshToken'>): Promise<Omit<User, 'password'>> {
-    const {
-      nombre_completo,
-      documento,
-      telefono,
-      correo,
-      password,
-      id_rol,
-    } = body;
+  async create(
+    @Body() body: Omit<User, 'id' | 'refreshToken'>,
+  ): Promise<Omit<User, 'password'>> {
+    const { nombre_completo, documento, telefono, correo, password, id_rol } =
+      body;
 
     if (!nombre_completo || !documento || !password || !id_rol) {
-      throw new BadRequestException('Faltan campos obligatorios: nombre_completo, documento, password o rol.');
+      throw new BadRequestException(
+        'Faltan campos obligatorios: nombre_completo, documento, password o rol.',
+      );
     }
 
     const hash = await bcrypt.hash(password, 10);
@@ -77,7 +83,9 @@ export class UserController {
 
   // 🔍 Obtener usuario por ID
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Omit<User, 'password'>> {
+  async findOne(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<Omit<User, 'password'>> {
     const user = await this.userService.findUserById(id);
     const { password, ...rest } = user;
     return rest;
@@ -102,7 +110,9 @@ export class UserController {
 
   // 🗑️ Eliminar usuario
   @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<{ success: boolean }> {
+  async remove(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<{ success: boolean }> {
     await this.userService.deleteUser(id);
     return { success: true };
   }
