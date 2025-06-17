@@ -5,6 +5,6 @@ export class LoginDto {
   documento: string;
 
   @IsString()
-  @MinLength(4)
+  @MinLength(6)
   password: string;
 }
