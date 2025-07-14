@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { RolesService } from './roles.service';
 import { FindRoleByIdDto } from './dto/find-role-by-id.dto';
+import { RolesService } from './roles.service';
 
 @Controller('roles')
 export class RolesController {

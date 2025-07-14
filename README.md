@@ -97,13 +97,14 @@ INSERT INTO Users (
   correo,
   password,
   refreshToken,
-  id_rol
+  id_rol,
+  is_active
 ) VALUES (
   'Jose Daniel Fabra',
   '1234',
   '3001234567',
   'admin@itm.edu.co',
-  '$12$drQYU5NjLwgFa4vE.mFdKeiDD63BKZH8Q/ht8kUosEghxWXMwMFfS',
+  '$2b$10$K7m3Ps.cTS3ThgyqlBfs6.2RnSsm0yPAtqFVDVuq5NT441JvtqH8q',
   NULL,
   1,  -- id del rol "SuperAdmin"
   1 

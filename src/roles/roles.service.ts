@@ -28,7 +28,9 @@ export class RolesService {
 
   // Opcional: completar también findAll
   async findAll(): Promise<ApiResponse<Rol[]>> {
-    const roles = await this.dataSource.query(`SELECT id, nombre FROM Roles`);
+    const roles = await this.dataSource.query(
+      `SELECT id, nombre FROM Roles ORDER BY id`,
+    );
     return {
       success: true,
       message: 'Lista de roles',
